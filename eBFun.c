@@ -3,11 +3,16 @@
 #include "usStruct.h"
 #include "rhoFun.h"
 
-/**************************************************
- * eBp_Integrand: 参与者(p)产生的磁场(eB_p)的被积函数。*
- **************************************************/
+static int eB_Integrand(const int *ndim, const double xx[],
+			 const int *ncomp, double ff[], void *userdata);
+static inline double f(double Y, double Y0, double a);
 
-static int eBp_Integrand(const int *ndim, const double xx[],
+
+/***************************************************
+ * eB_Integrand: 磁场(eB)的被积函数。                 *
+ ***************************************************/
+
+static int eB_Integrand(const int *ndim, const double xx[],
 			 const int *ncomp, double ff[], void *userdata) {
 
   struct userdata *ud = (struct userdata *) userdata;
@@ -70,3 +75,5 @@ static int eBp_Integrand(const int *ndim, const double xx[],
 static inline double f(double Y, double Y0, double a) {
   return (a*exp(a*Y)) / (2*sinh(a*Y0));
 }
+
+
