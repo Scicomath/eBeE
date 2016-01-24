@@ -1,9 +1,9 @@
 #include <stdio.h>
+#include <gsl/gsl_math.h>
 #include <math.h>
 #include "rhoFun.h"
 #include "sq.h"
 
-const double pi = 3.141592654;
 
 /***************************************************
  * rhoFun: 计算(x_p,y_p)处的核数密度，核数密度按照均分布 *
@@ -29,9 +29,9 @@ double rhoFun(double x_p, double y_p, double R, double b, char flag) {
 
   len = Sq(R) - (Sq(x_p - b/2) + Sq(y_p));
   if (len >= 0)
-    rho = 2.0*len / (4.0*pi*Pow3(R)/3.0);
+    rho = 2.0*sqrt(len) / (4.0 * M_PI * Pow3(R)/3.0);
   else // 如果len < 0 则表明在核外
     rho = 0.0;
-
+  
   return rho;
 }

@@ -22,8 +22,10 @@ struct intargu {
   double epsabs; // 绝对误差限
   int flags; // 积分控制变量，一般用来设置输出信息的多少, 示例中的值为2
   int seed; // 随机种子， 示例中的值为0
-  int mineval; // 被积函数被计算的最少次数，示例中的值为0
-  int maxeval; // 被积函数被计算的(近似)最大次数，示例中的值为50000
+  int pmineval; // （针对参与者）被积函数被计算的最少次数，示例中的值为0
+  int pmaxeval; // （针对参与者）被积函数被计算的(近似)最大次数，示例中的值为50000
+  int smineval; // （针对参与者）被积函数被计算的最少次数，示例中的值为0
+  int smaxeval; // （针对参与者）被积函数被计算的(近似)最大次数，示例中的值为50000
   
   int nstart;  // [V]the number of integrand evaluations per iteration to start with. demo's value is 1000
   int nincrease; // [V]the increase in the number of integrand evaluations per iteration. demo's value is 500

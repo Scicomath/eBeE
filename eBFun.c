@@ -79,20 +79,20 @@ static int eB_Integrand(const int *ndim, const double xx[],
       eB_y = 0.0;
   } else if (ud->type == 's') {
     // 判断符号正负
-    if (ud->type == '+')
+    if (ud->flag == '+')
       sign = 1.0;
     else
       sign = -1.0;
 
     denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->tau * sinh(ud->Y0)) ,1.5));
-    // printf("denominator = %5.3f \n", denominator);
     // 判断是否在被积区域内
     if ( (Sq(x_p + sign*ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
 	 (Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) ) // fabs(denominator) > 0.001
       eB_y = rhoFun(x_p, y_p, ud->R, ud->b, ud->flag) *
 	(ud->x - x_p) / denominator;
-    else
+    else {
       eB_y = 0.0;
+    }
     
   } else {
     printf("[eBpFun.c]error: 被积函数类型(type)只能为，参与者'p'或旁观者's'\n");
@@ -139,54 +139,56 @@ int eB(const double x, const double y, const double tau,
   ud.type = 'p';
   ud.flag = '+';
   Vegas(3, 1, eB_Integrand, &ud, ag->nvec,
-	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
-	ag->mineval, ag->maxeval, ag->nstart, ag->nincrease,
-	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
-	&neval, &fail, &integral, &error, &prob);
+  	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
+  	ag->pmineval, ag->pmaxeval, ag->nstart, ag->nincrease,
+  	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
+  	&neval, &fail, &integral, &error, &prob);
   constant = Sq(hbarc) * Z * alpha_EM;
   eBp_plus = constant * integral;
-  error = constant * error;
+  error = fabs(constant * error);
   printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
   printf("    eBp_plus:\t%.8f +- %.8f\tp = %.3f\n", eBp_plus, error, prob);
 
   ud.type = 'p';
   ud.flag = '-';
   Vegas(3, 1, eB_Integrand, &ud, ag->nvec,
-	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
-	ag->mineval, ag->maxeval, ag->nstart, ag->nincrease,
-	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
-	&neval, &fail, &integral, &error, &prob);
+  	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
+  	ag->pmineval, ag->pmaxeval, ag->nstart, ag->nincrease,
+  	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
+  	&neval, &fail, &integral, &error, &prob);
   constant = -constant;
   eBp_minus = constant * integral;
-  error = constant * error;
+  error = fabs(constant * error);
   printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
   printf("    eBp_minus:\t%.8f +- %.8f\tp = %.3f\n", eBp_minus, error, prob);
 
   ud.type = 's';
   ud.flag = '+';
   Vegas(2, 1, eB_Integrand, &ud, ag->nvec,
-	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
-	ag->mineval, ag->maxeval, ag->nstart, ag->nincrease,
-	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
-	&neval, &fail, &integral, &error, &prob);
+  	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
+  	ag->smineval, ag->smaxeval, ag->nstart, ag->nincrease,
+  	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
+  	&neval, &fail, &integral, &error, &prob);
   constant = Sq(hbarc) * Z * alpha_EM * sinh(Y0);
   eBs_plus = constant * integral;
-  error = constant * error;
+  error = fabs(constant * error);
   printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
   printf("    eBs_plus:\t%.8f +- %.8f\tp = %.3f\n", eBs_plus, error, prob);
 
   ud.type = 's';
   ud.flag = '-';
   Vegas(2, 1, eB_Integrand, &ud, ag->nvec,
-	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
-	ag->mineval, ag->maxeval, ag->nstart, ag->nincrease,
-	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
-	&neval, &fail, &integral, &error, &prob);
+  	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
+  	ag->smineval, ag->smaxeval, ag->nstart, ag->nincrease,
+  	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
+  	&neval, &fail, &integral, &error, &prob);
   constant = -constant;
   eBs_minus = constant * integral;
-  error = constant * error;
+  error = fabs(constant * error);
   printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
   printf("   eBs_minus:\t%.8f +- %.8f\tp = %.3f\n", eBs_minus, error, prob);
 
+  *eBy = eBp_plus + eBp_minus + eBs_plus + eBs_minus;
+  
   return 0;
 }
