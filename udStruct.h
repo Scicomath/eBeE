@@ -9,14 +9,14 @@ struct userdata {
   double a;   // 参数a
   char flag;  // 核标记，'+'表示沿z轴正方向的核(即左核)，'-'表示沿z轴负方向的核(即右核)
   char type;  // 被积区域类型，'p'表示参与者，'s'表示旁观者
-  double min[3]; // 积分下限，分别为x, y, Y的下限
-  double max[3]; // 积分上限，分别为x, y, Y的下限
+  // double min[3]; // 积分下限，分别为x, y, Y的下限
+  // double max[3]; // 积分上限，分别为x, y, Y的下限
 };
 
 /* 积分参数结构体 */
 struct intargu {
-  int ndim; // 积分维数
-  int ncomp; // 被积函数分量数
+  // int ndim; // 积分维数
+  // int ncomp; // 被积函数分量数
   int nvec;  // 每次调用被积函数的最大计算点数， 一般设置为1
   double epsrel; // 相对误差限
   double epsabs; // 绝对误差限

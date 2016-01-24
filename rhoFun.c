@@ -1,6 +1,7 @@
+#include <stdio.h>
 #include <math.h>
 #include "rhoFun.h"
-#include "sqrt.h"
+#include "sq.h"
 
 const double pi = 3.141592654;
 
@@ -26,7 +27,7 @@ double rhoFun(double x_p, double y_p, double R, double b, char flag) {
   else
     printf("[rhoFun]error: 核类型(flag)应该为‘+’或者为'-'\n");
 
-  len = Sqrt(R) - (Sqrt(x_p - b/2) + Sqrt(y_p));
+  len = Sq(R) - (Sq(x_p - b/2) + Sq(y_p));
   if (len >= 0)
     rho = 2.0*len / (4.0*pi*Pow3(R)/3.0);
   else // 如果len < 0 则表明在核外

@@ -1,7 +1,7 @@
-#ifndef SQRT_H
-#define SQRT_H
+#ifndef SQ_H
+#define SQ_H
 
-inline double Sqrt(double x) {
+inline double Sq(double x) {
   return x*x;
 }
 
