@@ -27,15 +27,21 @@ int main(void)
 
   x = 4.0;
   y = 2.0;
-  tau = 0.01;
+  tau = 0.5;
   R = 7.0;
   b = 10.0;
   Y0 = 5.36;
   a = 0.5;
   Z = 79.0;
-  
+  printf("# parameter:\n");
+  printf("# tau = %g\n", tau);
+  printf("# R = %g\n", R);
+  printf("# b = %g\n", b);
+  printf("# Y0 = %g\n", Y0);
+  printf("# Z = %g\n", Z);
+
   int i, j;
-  for (i = 0; i <= 200; i++) { // i = 201; i <= 400; i++
+  for (i = 0; i <= 400; i++) { // i = 201; i <= 400; i++
     for (j = 0; j <= 400; j++) {
       x = -10. + (20.)*i/400.;
       y = -10. + (20.)*j/400.;
