@@ -2,9 +2,12 @@
 struct userdata {
   double R; // 核半径
   double b; // 碰撞参量
-  double x; // 场点横坐标
-  double y; // 场点纵坐标
-  double tau; // 固有时tau
+  double x; // 场点x坐标
+  double y; // 场点y坐标
+  double z; // 场点z坐标
+  double t; // 时间t
+  double d; // 核几何参数
+  double n0; // 核中心数密度
   double Y0;  // 初始快度Y0
   double a;   // 参数a
   char flag;  // 核标记，'+'表示沿z轴正方向的核(即左核)，'-'表示沿z轴负方向的核(即右核)

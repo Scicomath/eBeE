@@ -6,15 +6,18 @@
 
 
 /***************************************************
- * rhoFun: 计算(x_p,y_p)处的核数密度，核数密度按照均分布 *
+ * rhoFun: 计算(x_p,y_p,z_p)处的核数密度，核数密度按照均分布 *
  ***************************************************/
 
-double rhoFun(double x_p, double y_p, double R, double b, char flag) {
-  // x_p, y_p: 横纵坐标
+double rhoFun(double x_p, double y_p, double z_p, double R, double b, double d, double n0, double Y, char flag) {
+  // x_p, y_p, z_p: 源点坐标
   // R: 核的半径
   // b: 碰撞参量
+  // d: 核几何参数
+  // n0: 核中心数密度
+  // Y: 核运动快度
   // flag: 核标记，'+'表示沿z轴正方向的核(即左核)，'-'表示沿z轴负方向的核(即右核)
-  // 返回值: 相应核(x_p, y_p)处的数密度
+  // 返回值: 相应核(x_p, y_p, z_p)处的数密度
 
   double rho;
   double len;
@@ -27,11 +30,8 @@ double rhoFun(double x_p, double y_p, double R, double b, char flag) {
   else
     printf("[rhoFun]error: 核类型(flag)应该为‘+’或者为'-'\n");
 
-  len = Sq(R) - (Sq(x_p - b/2) + Sq(y_p));
-  if (len >= 0)
-    rho = 2.0*sqrt(len) / (4.0 * M_PI * Pow3(R)/3.0);
-  else // 如果len < 0 则表明在核外
-    rho = 0.0;
-  
+  len = sqrt(Sq(x_p - b/2) + Sq(y_p) + Sq(cosh(Y)*z_p));
+  rho = n0 / ( 1 + exp((len-R)/d) );
+
   return rho;
 }

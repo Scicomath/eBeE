@@ -27,11 +27,17 @@ static int eB_Integrand(const int *ndim, const double xx[],
   static double jacobian;
   static double denominator;
   
-  static double x_p; // 积分变量源点横坐标
-  static double y_p; // 积分变量源点纵坐标
+  static double x_p; // 积分变量源点x坐标
+  static double y_p; // 积分变量源点y坐标
+  static double z_p; // 积分变量源点z坐标
   static double Y;   // 积分变量快度(注意不是初始快度Y0)
-  static double Imin[3]; // 积分下限
-  static double Imax[3]; // 积分上限
+  static double Imin[4]; // 积分下限
+  static double Imax[4]; // 积分上限
+  static double gamma; // 洛伦兹收缩因子
+  static dobule factor; // 范围扩大因子
+
+  gamma = cosh(ud->Y0);
+  factor = 1.2;
   
   // 根据被积区域类型和核标记确定积分上下限
   if (ud->type == 'p') {
@@ -39,27 +45,34 @@ static int eB_Integrand(const int *ndim, const double xx[],
     Imax[0] = ud->R - ud->b/2.0;
     Imin[1] = -sqrt(Sq(ud->R) - Sq(ud->b/2.0));
     Imax[1] = sqrt(Sq(ud->R) - Sq(ud->b/2.0));
-    Imin[2] = -ud->Y0;
-    Imax[2] = ud->Y0;
+    Imin[2] = -ud->R / gamma * factor; // 乘以factor是因为wood-saxon分布并不是完全在半径为R的球内
+    Imax[2] = ud->R / gamma * factro;
+    Imin[3] = -ud->Y0;
+    Imax[3] = ud->Y0;
   } else {
     // 判断核标记
     if (ud->flag == '+') {
-      Imin[0] = -(ud->R + ud->b/2.0);
+      Imin[0] = -(ud->R + ud->b/2.0) * factor;
       Imax[0] = 0.0;
-      Imin[1] = -ud->R;
-      Imax[1] = ud->R;
+      Imin[1] = -ud->R * factor;
+      Imax[1] = ud->R * factor;
+      Imin[2] = -ud->R / gamma * factor;
+      Imax[2] = ud->R / gamma * factor;
     } else {
       Imin[0] = 0.0;
-      Imax[0] = ud->R + ud->b/2.0;
-      Imin[1] = -ud->R;
-      Imax[1] = ud->R;
+      Imax[0] = (ud->R + ud->b/2.0) * factor;
+      Imin[1] = -ud->R * factor;
+      Imax[1] = ud->R * factor;
+      Imin[2] = -ud->R / gamma * factor;
+      Imax[2] = ud->R / gamma * factor;
     }
   }
   // 变量变换 x -> min + (max - min) * x 将积分区间变为0-1
   x_p = Imin[0] + (Imax[0] - Imin[0]) * xx[0];
   y_p = Imin[1] + (Imax[1] - Imin[1]) * xx[1];
-  if (*ndim == 3)
-    Y = Imin[2] + (Imax[2] - Imin[2]) * xx[2];
+  z_p = Imin[2] + (Imax[2] - Imin[2]) * xx[2];
+  if (*ndim == 4)
+    Y = Imin[3] + (Imax[3] - Imin[3]) * xx[3];
 
   
 
@@ -68,11 +81,12 @@ static int eB_Integrand(const int *ndim, const double xx[],
   
   // 判断被积区域类型
   if (ud->type == 'p') { // 对于参与者(p)
-    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->tau * sinh(Y)) ,1.5));
+    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(Y) + (z_p - ud->z)*cosh(Y)) ,1.5));
     // 判断是否在被积区域内
     if ( (Sq(x_p + ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
-	 (Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) ) {// fabs(denominator) > 0.001
-      eB_y = f(Y,ud->Y0,ud->a) * sinh(Y) * rhoFun(x_p, y_p, ud->R, ud->b, ud->flag ) *
+	 (Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
+	 (fabs(denominator) > 0.0001) ) {
+      eB_y = f(Y,ud->Y0,ud->a) * sinh(Y) * rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->Y0, ud->flag ) *
 	(ud->x - x_p) / denominator;
     }
     else
@@ -84,11 +98,12 @@ static int eB_Integrand(const int *ndim, const double xx[],
     else
       sign = -1.0;
 
-    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->tau * sinh(ud->Y0)) ,1.5));
+    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(ud->Y0) + (z_p - ud->z)*cosh(ud->Y0)) ,1.5));
     // 判断是否在被积区域内
-    if ( (Sq(x_p + sign*ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
-	 (Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) ) // fabs(denominator) > 0.001
-      eB_y = rhoFun(x_p, y_p, ud->R, ud->b, ud->flag) *
+    if ( //(Sq(x_p + sign*ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
+	 (Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) &&
+	 (fabs(denominator) > 0.0001) ) 
+      eB_y = rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->Y0 ud->flag) *
 	(ud->x - x_p) / denominator;
     else {
       eB_y = 0.0;
