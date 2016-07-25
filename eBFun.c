@@ -34,7 +34,7 @@ static int eB_Integrand(const int *ndim, const double xx[],
   static double Imin[4]; // 积分下限
   static double Imax[4]; // 积分上限
   static double gamma; // 洛伦兹收缩因子
-  static dobule factor; // 范围扩大因子
+  static double factor; // 范围扩大因子
 
   gamma = cosh(ud->Y0);
   factor = 1.2;
@@ -46,7 +46,7 @@ static int eB_Integrand(const int *ndim, const double xx[],
     Imin[1] = -sqrt(Sq(ud->R) - Sq(ud->b/2.0));
     Imax[1] = sqrt(Sq(ud->R) - Sq(ud->b/2.0));
     Imin[2] = -ud->R / gamma * factor; // 乘以factor是因为wood-saxon分布并不是完全在半径为R的球内
-    Imax[2] = ud->R / gamma * factro;
+    Imax[2] = ud->R / gamma * factor;
     Imin[3] = -ud->Y0;
     Imax[3] = ud->Y0;
   } else {
@@ -85,7 +85,7 @@ static int eB_Integrand(const int *ndim, const double xx[],
     // 判断是否在被积区域内
     if ( (Sq(x_p + ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
 	 (Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
-	 (fabs(denominator) > 0.0001) ) {
+	 (fabs(denominator) > 0.00001) ) {
       eB_y = f(Y,ud->Y0,ud->a) * sinh(Y) * rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->Y0, ud->flag ) *
 	(ud->x - x_p) / denominator;
     }
@@ -102,8 +102,8 @@ static int eB_Integrand(const int *ndim, const double xx[],
     // 判断是否在被积区域内
     if ( //(Sq(x_p + sign*ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
 	 (Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) &&
-	 (fabs(denominator) > 0.0001) ) 
-      eB_y = rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->Y0 ud->flag) *
+	 (fabs(denominator) > 0.00001) ) 
+      eB_y = rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->Y0, ud->flag) *
 	(ud->x - x_p) / denominator;
     else {
       eB_y = 0.0;
@@ -132,11 +132,11 @@ static inline double f(double Y, double Y0, double a) {
 
 
 /**************************************************
- * eB: 计算(x,y)点处的磁场                           *
+ * eB: 计算(x,y,z)点处的磁场                         *
  **************************************************/
-int eB(const double x, const double y, const double tau,
-       const double R, const double b, const double Y0,
-       const double a, const double Z,
+int eB(const double x, const double y, const double z, const double t,
+       const double R, const double b, const double Y0, const double d,
+       const double n0, const double a, const double Z,
        const struct intargu *ag, double *eBy) {
   int comp, nregions, neval, fail;
   double integral, error, prob;
@@ -145,15 +145,19 @@ int eB(const double x, const double y, const double tau,
   static struct userdata ud;
   ud.x = x;
   ud.y = y;
-  ud.tau = tau;
+  ud.z = z;
+  ud.t = t;
   ud.R = R;
   ud.b = b;
+  ud.d = d;
+  ud.n0 = n0;
   ud.Y0 = Y0;
   ud.a = a;
+  ud.Z = Z;
 
   ud.type = 'p';
   ud.flag = '+';
-  Vegas(3, 1, eB_Integrand, &ud, ag->nvec,
+  Vegas(4, 1, eB_Integrand, &ud, ag->nvec,
   	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
   	ag->pmineval, ag->pmaxeval, ag->nstart, ag->nincrease,
   	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
@@ -161,12 +165,12 @@ int eB(const double x, const double y, const double tau,
   constant = Sq(hbarc) * Z * alpha_EM;
   eBp_plus = constant * integral;
   error = fabs(constant * error);
-  //printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  //printf("    eBp_plus:\t%.8f +- %.8f\tp = %.3f\n", eBp_plus, error, prob);
+  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+  printf("    eBp_plus:\t%.8f +- %.8f\tp = %.3f\n", eBp_plus, error, prob);
 
   ud.type = 'p';
   ud.flag = '-';
-  Vegas(3, 1, eB_Integrand, &ud, ag->nvec,
+  Vegas(4, 1, eB_Integrand, &ud, ag->nvec,
   	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
   	ag->pmineval, ag->pmaxeval, ag->nstart, ag->nincrease,
   	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
@@ -174,12 +178,12 @@ int eB(const double x, const double y, const double tau,
   constant = -constant;
   eBp_minus = constant * integral;
   error = fabs(constant * error);
-  //printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  //printf("    eBp_minus:\t%.8f +- %.8f\tp = %.3f\n", eBp_minus, error, prob);
+  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+  printf("    eBp_minus:\t%.8f +- %.8f\tp = %.3f\n", eBp_minus, error, prob);
 
   ud.type = 's';
   ud.flag = '+';
-  Vegas(2, 1, eB_Integrand, &ud, ag->nvec,
+  Vegas(3, 1, eB_Integrand, &ud, ag->nvec,
   	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
   	ag->smineval, ag->smaxeval, ag->nstart, ag->nincrease,
   	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
@@ -187,12 +191,12 @@ int eB(const double x, const double y, const double tau,
   constant = Sq(hbarc) * Z * alpha_EM * sinh(Y0);
   eBs_plus = constant * integral;
   error = fabs(constant * error);
-  //printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  //printf("    eBs_plus:\t%.8f +- %.8f\tp = %.3f\n", eBs_plus, error, prob);
+  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+  printf("    eBs_plus:\t%.8f +- %.8f\tp = %.3f\n", eBs_plus, error, prob);
 
   ud.type = 's';
   ud.flag = '-';
-  Vegas(2, 1, eB_Integrand, &ud, ag->nvec,
+  Vegas(3, 1, eB_Integrand, &ud, ag->nvec,
   	ag->epsrel, ag->epsabs, ag->flags, ag->seed,
   	ag->smineval, ag->smaxeval, ag->nstart, ag->nincrease,
   	ag->nbatch, ag->gridno, ag->statefile, ag->spin,
@@ -200,8 +204,8 @@ int eB(const double x, const double y, const double tau,
   constant = -constant;
   eBs_minus = constant * integral;
   error = fabs(constant * error);
-  //printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  //printf("   eBs_minus:\t%.8f +- %.8f\tp = %.3f\n", eBs_minus, error, prob);
+  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+  printf("   eBs_minus:\t%.8f +- %.8f\tp = %.3f\n", eBs_minus, error, prob);
 
   *eBy = eBp_plus + eBp_minus + eBs_plus + eBs_minus;
   

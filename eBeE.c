@@ -6,7 +6,7 @@
 int main(void)
 {
   struct intargu ag;
-  double x, y, tau, R, b, Y0, a, Z, eBy;
+  double x, y, z, t, R, b, Y0, d, n0, a, Z, eBy;
   ag.nvec = 1;
   ag.epsrel = 1e-6;
   ag.epsabs = 1e-6;
@@ -25,21 +25,25 @@ int main(void)
   ag.statefile = NULL;
   ag.spin = NULL;
 
-  x = 4.0;
-  y = 2.0;
-  tau = 0.5;
-  R = 7.0;
-  b = 10.0;
+  x = 0.0;
+  y = 0.0;
+  z = 0.0;
+  t = 0.01;
+  R = 6.38;
+  b = 8.0;
   Y0 = 5.36;
+  d = 0.535;
+  n0 = 8.596268e-4;
   a = 0.5;
   Z = 79.0;
   printf("# parameter:\n");
-  printf("# tau = %g\n", tau);
+  printf("# t = %g\n", t);
   printf("# R = %g\n", R);
   printf("# b = %g\n", b);
   printf("# Y0 = %g\n", Y0);
   printf("# Z = %g\n", Z);
 
+  /*
   int i, j;
   for (i = 0; i <= 400; i++) { // i = 201; i <= 400; i++
     for (j = 0; j <= 400; j++) {
@@ -49,11 +53,11 @@ int main(void)
       printf("%f %f %f\n",x, y, eBy);
     }
   }
-
+  */
   
-  /* eB(x, y, tau, R, b, Y0, a, Z, &ag, &eBy); */
+  eB(x, y, z, t, R, b, Y0, d, n0, a, Z, &ag, &eBy);
 
-  /* printf("eBy = %5.3f\n", eBy); */
+  printf("eBy = %5.3f\n", eBy);
+  
   return 0;
-  
 }
