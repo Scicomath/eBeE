@@ -1,14 +1,23 @@
-eBeE: eBeE.o eBFun.o rhoFun.o sq.o
-	gcc -O3 -o eBeE eBeE.o eBFun.o rhoFun.o sq.o -I. libcuba.a -lgsl -lgslcblas -lm
+CC=gcc
+CFLAGS=-O3 -std=c99
+
+objects = eBeE.o eBFun.o rhoFun.o sq.o
+
+eBeE: $(objects)
+	$(CC) $(CFLAGS) -o eBeE $(objects) -I. libcuba.a -lgsl -lgslcblas -lm
 
 eBeE.o: eBeE.c udStruct.h eBFun.h
-	gcc -O3 -c eBeE.c
+	$(CC) $(CFLAGS) -c eBeE.c
 
 eBFun.o: eBFun.c cuba.h udStruct.h rhoFun.h eBFun.h sq.h
-	gcc -O3 -c eBFun.c
+	$(CC) $(CFLAGS) -c eBFun.c
 
 rhoFun.o: rhoFun.c rhoFun.h sq.h
-	gcc -O3 -c rhoFun.c
+	$(CC) $(CFLAGS) -c rhoFun.c
 
 sq.o: sq.c sq.h
-	gcc -O3 -c sq.c
+	$(CC) $(CFLAGS) -c sq.c
+
+.PHONY: clean
+clean:
+	-rm eBeE $(objects)
