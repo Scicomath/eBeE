@@ -146,8 +146,8 @@ int eB(const double x, const double y, const double tau,
   constant = Sq(hbarc) * Z * alpha_EM;
   eBp_plus = constant * integral;
   error = fabs(constant * error);
-  //printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  //printf("    eBp_plus:\t%.8f +- %.8f\tp = %.3f\n", eBp_plus, error, prob);
+  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+  printf("    eBp_plus:\t%.8f +- %.8f\tp = %.3f\n", eBp_plus, error, prob);
 
   ud.type = 'p';
   ud.flag = '-';
@@ -159,8 +159,8 @@ int eB(const double x, const double y, const double tau,
   constant = -constant;
   eBp_minus = constant * integral;
   error = fabs(constant * error);
-  //printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  //printf("    eBp_minus:\t%.8f +- %.8f\tp = %.3f\n", eBp_minus, error, prob);
+  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+  printf("    eBp_minus:\t%.8f +- %.8f\tp = %.3f\n", eBp_minus, error, prob);
 
   ud.type = 's';
   ud.flag = '+';
@@ -172,8 +172,8 @@ int eB(const double x, const double y, const double tau,
   constant = Sq(hbarc) * Z * alpha_EM * sinh(Y0);
   eBs_plus = constant * integral;
   error = fabs(constant * error);
-  //printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  //printf("    eBs_plus:\t%.8f +- %.8f\tp = %.3f\n", eBs_plus, error, prob);
+  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+  printf("    eBs_plus:\t%.8f +- %.8f\tp = %.3f\n", eBs_plus, error, prob);
 
   ud.type = 's';
   ud.flag = '-';
@@ -185,8 +185,8 @@ int eB(const double x, const double y, const double tau,
   constant = -constant;
   eBs_minus = constant * integral;
   error = fabs(constant * error);
-  //printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  //printf("   eBs_minus:\t%.8f +- %.8f\tp = %.3f\n", eBs_minus, error, prob);
+  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+  printf("   eBs_minus:\t%.8f +- %.8f\tp = %.3f\n", eBs_minus, error, prob);
 
   *eBy = eBp_plus + eBp_minus + eBs_plus + eBs_minus;
   

@@ -25,11 +25,11 @@ int main(void)
   ag.statefile = NULL;
   ag.spin = NULL;
 
-  x = 4.0;
-  y = 2.0;
-  tau = 0.5;
+  x = 0.0;
+  y = 0.0;
+  tau = 0.1;
   R = 7.0;
-  b = 10.0;
+  b = 6.0;
   Y0 = 5.36;
   a = 0.5;
   Z = 79.0;
@@ -40,6 +40,7 @@ int main(void)
   printf("# Y0 = %g\n", Y0);
   printf("# Z = %g\n", Z);
 
+  /*
   int i, j;
   for (i = 0; i <= 400; i++) { // i = 201; i <= 400; i++
     for (j = 0; j <= 400; j++) {
@@ -49,11 +50,11 @@ int main(void)
       printf("%f %f %f\n",x, y, eBy);
     }
   }
-
+  */
   
-  /* eB(x, y, tau, R, b, Y0, a, Z, &ag, &eBy); */
+  eB(x, y, tau, R, b, Y0, a, Z, &ag, &eBy);
 
-  /* printf("eBy = %5.3f\n", eBy); */
+  printf("eBy = %5.3f\n", eBy);
+
   return 0;
-  
 }
