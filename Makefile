@@ -5,6 +5,11 @@ objects = eBeE.o eBFun.o rhoFun.o sq.o
 
 eBeE: $(objects)
 	$(CC) $(CFLAGS) -o eBeE $(objects) -I. libcuba.a -lgsl -lgslcblas -lm
+testrho: testrho.o rhoFun.o sq.o
+	$(CC) $(CFLAGS) -o testrho testrho.o rhoFun.o sq.o -I. libcuba.a -lgsl -lgslcblas -lm
+
+testrho.o: testrho.c udStruct.h rhoFun.h sq.h
+	$(CC) $(CFLAGS) -c testrho.c
 
 eBeE.o: eBeE.c udStruct.h eBFun.h
 	$(CC) $(CFLAGS) -c eBeE.c
@@ -20,4 +25,4 @@ sq.o: sq.c sq.h
 
 .PHONY: clean
 clean:
-	-rm eBeE $(objects)
+	-rm eBeE testrho $(objects)

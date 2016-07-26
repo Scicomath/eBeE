@@ -21,6 +21,8 @@ double rhoFun(double x_p, double y_p, double z_p, double R, double b, double d, 
 
   double rho;
   double len;
+  double gamma;
+  gamma = cosh(Y);
   
   // 判断是左核(+)还是右核(-)
   if (flag == '+')
@@ -30,8 +32,8 @@ double rhoFun(double x_p, double y_p, double z_p, double R, double b, double d, 
   else
     printf("[rhoFun]error: 核类型(flag)应该为‘+’或者为'-'\n");
 
-  len = sqrt(Sq(x_p - b/2) + Sq(y_p) + Sq(cosh(Y)*z_p));
-  rho = n0 / ( 1 + exp((len-R)/d) );
+  len = sqrt(Sq(x_p - b/2) + Sq(y_p) + Sq(gamma*z_p));
+  rho = gamma * n0 / ( 1 + exp((len-R)/d) ); // 乘以gamma因为密度变大
 
   return rho;
 }
