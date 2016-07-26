@@ -34,10 +34,10 @@ static int eB_Integrand(const int *ndim, const double xx[],
   static double Imin[4]; // 积分下限
   static double Imax[4]; // 积分上限
   static double gamma; // 洛伦兹收缩因子
-  static double factor; // 范围扩大因子
+  static double extra; // 范围扩大因子
 
   gamma = cosh(ud->Y0);
-  factor = 1.2;
+  extra = 3;
   
   // 根据被积区域类型和核标记确定积分上下限
   if (ud->type == 'p') {
@@ -45,26 +45,26 @@ static int eB_Integrand(const int *ndim, const double xx[],
     Imax[0] = ud->R - ud->b/2.0;
     Imin[1] = -sqrt(Sq(ud->R) - Sq(ud->b/2.0));
     Imax[1] = sqrt(Sq(ud->R) - Sq(ud->b/2.0));
-    Imin[2] = -ud->R / gamma * factor; // 乘以factor是因为wood-saxon分布并不是完全在半径为R的球内
-    Imax[2] = ud->R / gamma * factor;
+    Imin[2] = -(ud->R+extra) / gamma; // 加上extra是因为wood-saxon分布并不是完全在半径为R的球内
+    Imax[2] = (ud->R+extra) / gamma;
     Imin[3] = -ud->Y0;
     Imax[3] = ud->Y0;
   } else {
     // 判断核标记
     if (ud->flag == '+') {
-      Imin[0] = -(ud->R + ud->b/2.0) * factor;
+      Imin[0] = -(ud->R + ud->b/2.0) - extra;
       Imax[0] = 0.0;
-      Imin[1] = -ud->R * factor;
-      Imax[1] = ud->R * factor;
-      Imin[2] = -ud->R / gamma * factor;
-      Imax[2] = ud->R / gamma * factor;
+      Imin[1] = -ud->R - extra;
+      Imax[1] = ud->R - extra;
+      Imin[2] = -(ud->R+extra) / gamma;
+      Imax[2] = (ud->R+extra) / gamma;
     } else {
       Imin[0] = 0.0;
-      Imax[0] = (ud->R + ud->b/2.0) * factor;
-      Imin[1] = -ud->R * factor;
-      Imax[1] = ud->R * factor;
-      Imin[2] = -ud->R / gamma * factor;
-      Imax[2] = ud->R / gamma * factor;
+      Imax[0] = (ud->R + ud->b/2.0) + extra;
+      Imin[1] = -ud->R - extra;
+      Imax[1] = ud->R + extra;
+      Imin[2] = -(ud->R + extra) / gamma;
+      Imax[2] = (ud->R + extra) / gamma;
     }
   }
   // 变量变换 x -> min + (max - min) * x 将积分区间变为0-1
