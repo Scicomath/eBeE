@@ -14,8 +14,8 @@ int main(void)
   ag.seed = 0;
   ag.smineval = 1.5e4; // 1.5e5
   ag.smaxeval = 4e4;   // 1e6
-  ag.pmineval = 2e4; // 2.5e5
-  ag.pmaxeval = 5e4;   // 1e7
+  ag.pmineval = 2e5; // 2.5e5
+  ag.pmaxeval = 5e7;   // 1e7
 
   ag.nstart = 1000;
   ag.nincrease = 500;
@@ -28,9 +28,9 @@ int main(void)
   x = 0.0;
   y = 0.0;
   z = 0.0;
-  t = 0.01;
+  t = 0.1;
   R = 6.38;
-  b = 8.0;
+  b = 6.0;
   Y0 = 5.36;
   d = 0.535;
   n0 = 8.596268e-4;
