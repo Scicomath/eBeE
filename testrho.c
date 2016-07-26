@@ -33,6 +33,7 @@ int main(void)
   ud.b = 8;
   ud.d = 0.535;
   ud.n0 = 8.596268e-4;
+  ud.Y0 = 5.36;
   ud.flag = '-';
   
   int neval, fail;
