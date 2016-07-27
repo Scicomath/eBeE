@@ -108,8 +108,8 @@ static int eB_Integrand(const int *ndim, const double xx[],
     //denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(ud->Y0)) ,1.5));
     // 判断是否在被积区域内
     if ( //(Sq(x_p + sign*ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
-	(Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) )
-	 //(fabs(denominator) > 0.00001) ) 
+	(Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) &&
+	 (fabs(denominator) > 0.00001) ) 
       eB_y = rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->Y0, ud->flag) *
 	(ud->x - x_p) / denominator;
     else {
@@ -144,7 +144,7 @@ static inline double f(double Y, double Y0, double a) {
 int eB(const double x, const double y, const double z, const double t,
        const double R, const double b, const double Y0, const double d,
        const double n0, const double a, const double Z,
-       const struct intargu *ag, double *eBy) {
+       const struct intargu *ag, double *eBy, double *totalerror, const int verbose) {
   int comp, nregions, neval, fail;
   double integral, error, prob;
   double eBp_plus, eBp_minus, eBs_plus, eBs_minus;
@@ -162,6 +162,8 @@ int eB(const double x, const double y, const double z, const double t,
   ud.a = a;
   ud.Z = Z;
 
+  *totalerror = 0.0;
+
   ud.type = 'p';
   ud.flag = '+';
   Vegas(4, 1, eB_Integrand, &ud, ag->nvec,
@@ -172,8 +174,11 @@ int eB(const double x, const double y, const double z, const double t,
   constant = Sq(hbarc) * Z * alpha_EM;
   eBp_plus = constant * integral;
   error = fabs(constant * error);
-  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  printf("    eBp_plus:\t%.8f +- %.8f\tp = %.3f\n", eBp_plus, error, prob);
+  *totalerror += error;
+  if (verbose == 1) {
+    printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+    printf("    eBp_plus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBp_plus, error, error/eBp_plus*100.0, prob);
+  }
 
   ud.type = 'p';
   ud.flag = '-';
@@ -185,8 +190,11 @@ int eB(const double x, const double y, const double z, const double t,
   constant = -constant;
   eBp_minus = constant * integral;
   error = fabs(constant * error);
-  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  printf("    eBp_minus:\t%.8f +- %.8f\tp = %.3f\n", eBp_minus, error, prob);
+  *totalerror += error;
+  if (verbose == 1) {
+    printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+    printf("    eBp_minus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBp_minus, error, error/eBp_minus*100.0, prob);
+  }
 
   ud.type = 's';
   ud.flag = '+';
@@ -198,8 +206,11 @@ int eB(const double x, const double y, const double z, const double t,
   constant = Sq(hbarc) * Z * alpha_EM * sinh(Y0);
   eBs_plus = constant * integral;
   error = fabs(constant * error);
-  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  printf("    eBs_plus:\t%.8f +- %.8f\tp = %.3f\n", eBs_plus, error, prob);
+  *totalerror += error;
+  if (verbose == 1) {
+    printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+    printf("    eBs_plus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBs_plus, error, error/eBs_plus*100.0, prob);
+  }
 
   ud.type = 's';
   ud.flag = '-';
@@ -211,8 +222,11 @@ int eB(const double x, const double y, const double z, const double t,
   constant = -constant;
   eBs_minus = constant * integral;
   error = fabs(constant * error);
-  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  printf("   eBs_minus:\t%.8f +- %.8f\tp = %.3f\n", eBs_minus, error, prob);
+  *totalerror += error;
+  if (verbose == 1) {
+    printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+    printf("   eBs_minus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBs_minus, error, error/eBs_minus*100.0, prob);
+  }
 
   *eBy = eBp_plus + eBp_minus + eBs_plus + eBs_minus;
   

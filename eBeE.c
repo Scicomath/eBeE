@@ -6,7 +6,7 @@
 int main(void)
 {
   struct intargu ag;
-  double x, y, z, t, R, b, Y0, d, n0, a, Z, eBy;
+  double x, y, z, t, R, b, Y0, d, n0, a, Z, eBy, totalerror, verbose;
   ag.nvec = 1;
   ag.epsrel = 1e-6;
   ag.epsabs = 1e-6;
@@ -15,7 +15,7 @@ int main(void)
   ag.smineval = 1.5e4; // 1.5e5
   ag.smaxeval = 4e4;   // 1e6
   ag.pmineval = 2e5; // 2.5e5
-  ag.pmaxeval = 5e7;   // 1e7
+  ag.pmaxeval = 3e7;   // 1e7
 
   ag.nstart = 1000;
   ag.nincrease = 500;
@@ -28,7 +28,7 @@ int main(void)
   x = 0.0;
   y = 0.0;
   z = 0.0;
-  t = 0.1;
+  t = 0.0;
   R = 6.38;
   b = 6.0;
   Y0 = 5.36;
@@ -43,21 +43,41 @@ int main(void)
   printf("# Y0 = %g\n", Y0);
   printf("# Z = %g\n", Z);
 
-  /*
+  
+  // 计算原点磁场随时间变化
+  int i, N;
+  double tmin, tmax;
+  verbose = 0;
+  x = 0.0;
+  y = 0.0;
+  z = 0.0;
+  N = 100;
+  tmin = 0.0;
+  tmax = 3.0;
+  for (i = 0; i <= N; i++) {
+    t = tmin + (tmax - tmin)*i/N;
+    eB(x, y, z, t, R, b, Y0, d, n0, a, Z, &ag, &eBy, &totalerror, verbose);
+    printf("%8g\t%8g\t%8g\t%8g\n", t, eBy, totalerror, totalerror/eBy*100.0);
+  }
+  
+
+  /* // 计算x-y平面
   int i, j;
-  for (i = 0; i <= 400; i++) { // i = 201; i <= 400; i++
+  for (i = 0; i <= 400; i++) { 
     for (j = 0; j <= 400; j++) {
       x = -10. + (20.)*i/400.;
       y = -10. + (20.)*j/400.;
-      eB(x, y, tau, R, b, Y0, a, Z, &ag, &eBy);
+      eB(x, y, tau, R, b, Y0, a, Z, &ag, &eBy, &totalerror, verbose);
       printf("%f %f %f\n",x, y, eBy);
     }
   }
   */
-  
-  eB(x, y, z, t, R, b, Y0, d, n0, a, Z, &ag, &eBy);
 
-  printf("eBy = %5.3f\n", eBy);
-  
+  /*
+  // 单点计算
+  verbose = 1;
+  eB(x, y, z, t, R, b, Y0, d, n0, a, Z, &ag, &eBy, &totalerror, verbose);
+  printf("eBy = %g\terror = %g\trelerror = %g%%\n", eBy, totalerror, totalerror/eBy*100.0);
+  */
   return 0;
 }
