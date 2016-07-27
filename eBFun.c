@@ -68,10 +68,11 @@ static int eB_Integrand(const int *ndim, const double xx[],
   
   // 判断被积区域类型
   if (ud->type == 'p') { // 对于参与者(p)
-    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->tau * sinh(Y)) ,1.5));
+    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(Y)) ,1.5));
     // 判断是否在被积区域内
     if ( (Sq(x_p + ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
-	 (Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) ) {// fabs(denominator) > 0.001
+	 (Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
+	 (fabs(denominator) > 0.001) ) {
       eB_y = f(Y,ud->Y0,ud->a) * sinh(Y) * rhoFun(x_p, y_p, ud->R, ud->b, ud->flag ) *
 	(ud->x - x_p) / denominator;
     }
@@ -84,10 +85,11 @@ static int eB_Integrand(const int *ndim, const double xx[],
     else
       sign = -1.0;
 
-    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->tau * sinh(ud->Y0)) ,1.5));
+    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(ud->Y0)) ,1.5));
     // 判断是否在被积区域内
     if ( (Sq(x_p + sign*ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
-	 (Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) ) // fabs(denominator) > 0.001
+	 (Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) &&
+	 (fabs(denominator) > 0.001) ) 
       eB_y = rhoFun(x_p, y_p, ud->R, ud->b, ud->flag) *
 	(ud->x - x_p) / denominator;
     else {
@@ -119,10 +121,11 @@ static inline double f(double Y, double Y0, double a) {
 /**************************************************
  * eB: 计算(x,y)点处的磁场                           *
  **************************************************/
-int eB(const double x, const double y, const double tau,
+int eB(const double x, const double y, const double t,
        const double R, const double b, const double Y0,
        const double a, const double Z,
-       const struct intargu *ag, double *eBy) {
+       const struct intargu *ag, double *eBy, 
+       double *totalerror, const int verbose) {
   int comp, nregions, neval, fail;
   double integral, error, prob;
   double eBp_plus, eBp_minus, eBs_plus, eBs_minus;
@@ -130,11 +133,13 @@ int eB(const double x, const double y, const double tau,
   static struct userdata ud;
   ud.x = x;
   ud.y = y;
-  ud.tau = tau;
+  ud.t = t;
   ud.R = R;
   ud.b = b;
   ud.Y0 = Y0;
   ud.a = a;
+
+  *totalerror = 0.0;
 
   ud.type = 'p';
   ud.flag = '+';
@@ -146,8 +151,11 @@ int eB(const double x, const double y, const double tau,
   constant = Sq(hbarc) * Z * alpha_EM;
   eBp_plus = constant * integral;
   error = fabs(constant * error);
-  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  printf("    eBp_plus:\t%.8f +- %.8f\tp = %.3f\n", eBp_plus, error, prob);
+  *totalerror += error;
+  if (verbose == 1) {
+    printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+    printf("    eBp_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBp_plus, error, error/eBp_plus*100.0, prob);
+  }
 
   ud.type = 'p';
   ud.flag = '-';
@@ -159,8 +167,11 @@ int eB(const double x, const double y, const double tau,
   constant = -constant;
   eBp_minus = constant * integral;
   error = fabs(constant * error);
-  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  printf("    eBp_minus:\t%.8f +- %.8f\tp = %.3f\n", eBp_minus, error, prob);
+  *totalerror += error;
+  if (verbose == 1) {
+    printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+    printf("    eBp_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBp_minus, error, error/eBp_minus*100.0, prob);
+  }
 
   ud.type = 's';
   ud.flag = '+';
@@ -172,8 +183,11 @@ int eB(const double x, const double y, const double tau,
   constant = Sq(hbarc) * Z * alpha_EM * sinh(Y0);
   eBs_plus = constant * integral;
   error = fabs(constant * error);
-  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  printf("    eBs_plus:\t%.8f +- %.8f\tp = %.3f\n", eBs_plus, error, prob);
+  *totalerror += error;
+  if (verbose == 1) {
+    printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+    printf("    eBs_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBs_plus, error, error/eBs_plus*100.0, prob);
+  }
 
   ud.type = 's';
   ud.flag = '-';
@@ -185,8 +199,11 @@ int eB(const double x, const double y, const double tau,
   constant = -constant;
   eBs_minus = constant * integral;
   error = fabs(constant * error);
-  printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-  printf("   eBs_minus:\t%.8f +- %.8f\tp = %.3f\n", eBs_minus, error, prob);
+  *totalerror += error;
+  if (verbose == 1) {
+    printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+    printf("   eBs_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBs_minus, error, error/eBs_minus*100.0, prob);
+  }
 
   *eBy = eBp_plus + eBp_minus + eBs_plus + eBs_minus;
   

@@ -4,7 +4,7 @@ struct userdata {
   double b; // 碰撞参量
   double x; // 场点横坐标
   double y; // 场点纵坐标
-  double tau; // 固有时tau
+  double t; // 时间t
   double Y0;  // 初始快度Y0
   double a;   // 参数a
   char flag;  // 核标记，'+'表示沿z轴正方向的核(即左核)，'-'表示沿z轴负方向的核(即右核)
