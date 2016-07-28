@@ -30,7 +30,7 @@ double rhoFun(double x_p, double y_p, double z_p, double R, double b, double d, 
     printf("[rhoFun]error: 核类型(flag)应该为‘+’或者为'-'\n");
 
   len = sqrt(Sq(x_p - b/2) + Sq(y_p) + Sq(z_p));
-  rho = n0 / ( 1 + exp((len-R)/d) ); // 乘以gamma因为密度变大
+  rho = n0 / ( 1 + exp((len-R)/d) );
 
   return rho;
 }
