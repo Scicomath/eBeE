@@ -64,10 +64,10 @@ int main(void)
     } else {
       eBtminus(&ud, &ag, &eBy, &error, verbose);
     }
-    printf("  %-8g\t%-8g\t%-8g\t%-8g\n", ud.t, eBy, error, error/eBy*100.0);
+    printf("  %-8g\t%-8g\t%-8g\t%-8g\n", ud.t, eBy, error, fabs(error/eBy*100.0));
   }
   */
-  /*
+  
   // 计算x-y平面
   int i, j;
   verbose = 0;
@@ -80,12 +80,12 @@ int main(void)
       } else {
 	eBtminus(&ud, &ag, &eBy, &error, verbose);
       }
-      printf("  %-8g\t%-8g\t%-8g\t%-8g\t%-8g\n", ud.x, ud.y, eBy, error, error/eBy*100.0);
+      printf("  %-8g\t%-8g\t%-8g\t%-8g\t%-8g\n", ud.x, ud.y, eBy, error, fabs(error/eBy*100.0));
     }
   }
-  */
-
   
+
+  /*
   // 计算单点磁场
   verbose = 1;
   ud.x = -10.0;
@@ -97,7 +97,7 @@ int main(void)
     eBtminus(&ud, &ag, &eBy, &error, verbose);
   }
   printf("eBy = %g\terror = %g\trelerror = %g%%\n", eBy, error, fabs(error/eBy*100.0));
-  
+  */
   
   return 0;
 }
