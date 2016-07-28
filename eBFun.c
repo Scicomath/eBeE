@@ -33,10 +33,8 @@ static int eB_Integrand(const int *ndim, const double xx[],
   static double Y;   // 积分变量快度(注意不是初始快度Y0)
   static double Imin[4]; // 积分下限
   static double Imax[4]; // 积分上限
-  static double gamma; // 洛伦兹收缩因子
   static double extra; // 范围扩大因子
 
-  gamma = cosh(ud->Y0);
   extra = 3; // 加上extra是因为wood-saxon分布并不是完全在半径为R的球内
   
   // 根据被积区域类型和核标记确定积分上下限
@@ -45,8 +43,8 @@ static int eB_Integrand(const int *ndim, const double xx[],
     Imax[0] = ud->R - ud->b/2.0;
     Imin[1] = -sqrt(Sq(ud->R) - Sq(ud->b/2.0));
     Imax[1] = sqrt(Sq(ud->R) - Sq(ud->b/2.0));
-    Imin[2] = -(ud->R+extra) / gamma; 
-    Imax[2] = (ud->R+extra) / gamma;
+    Imin[2] = -(ud->R+extra); 
+    Imax[2] = (ud->R+extra);
     Imin[3] = -ud->Y0;
     Imax[3] = ud->Y0;
   } else {
@@ -56,15 +54,15 @@ static int eB_Integrand(const int *ndim, const double xx[],
       Imax[0] = 0.0;
       Imin[1] = -ud->R - extra;
       Imax[1] = ud->R + extra;
-      Imin[2] = -(ud->R+extra) / gamma;
-      Imax[2] = (ud->R+extra) / gamma;
+      Imin[2] = -(ud->R+extra);
+      Imax[2] = (ud->R+extra);
     } else {
       Imin[0] = 0.0;
       Imax[0] = (ud->R + ud->b/2.0) + extra;
       Imin[1] = -ud->R - extra;
       Imax[1] = ud->R + extra;
-      Imin[2] = -(ud->R + extra) / gamma;
-      Imax[2] = (ud->R + extra) / gamma;
+      Imin[2] = -(ud->R + extra);
+      Imax[2] = (ud->R + extra);
     }
   }
   // 变量变换 x -> min + (max - min) * x 将积分区间变为0-1
@@ -86,13 +84,13 @@ static int eB_Integrand(const int *ndim, const double xx[],
     else
       sign = -1.0;
 
-    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(Y) + (sign*z_p - ud->z)*cosh(Y)) ,1.5));
+    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(Y) - ud->z*cosh(Y)) ,1.5));
     //denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(Y)) ,1.5));
     // 判断是否在被积区域内
-    if ( (Sq(x_p + ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
-	 (Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
+    if ( (Sq(x_p + ud->b/2.0) + Sq(y_p) <= Sq(7.0)) &&//(Sq(x_p + ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
+	 (Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(7.0)) &&//(Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
 	 (fabs(denominator) > 0.001) ) {
-      eB_y = f(Y,ud->Y0,ud->a) * sinh(Y) * rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->Y0, ud->flag ) *
+      eB_y = f(Y,ud->Y0,ud->a) * sinh(Y) * rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->flag ) *
 	(ud->x - x_p) / denominator;
     }
     else
@@ -104,13 +102,13 @@ static int eB_Integrand(const int *ndim, const double xx[],
     else
       sign = -1.0;
 
-    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sign * sinh(ud->Y0) + (sign*z_p - ud->z)*cosh(ud->Y0)) ,1.5));
+    denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sign * sinh(ud->Y0) - ud->z*cosh(ud->Y0)) ,1.5));
     //denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(ud->Y0)) ,1.5));
     // 判断是否在被积区域内
     if ( //(Sq(x_p + sign*ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
-	(Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) &&
+	(Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(7.0)) &&//(Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) &&
 	 (fabs(denominator) > 0.001) ) 
-      eB_y = rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->Y0, ud->flag) *
+      eB_y = rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->flag) *
 	(ud->x - x_p) / denominator;
     else {
       eB_y = 0.0;
