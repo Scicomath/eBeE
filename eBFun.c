@@ -382,7 +382,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eBp_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBp_plus, error, error/eBp_plus*100.0, prob);
+      printf("    eBp_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBp_plus, error, fabs(error/eBp_plus*100.0), prob);
     }
 
     ud->type = 'p';
@@ -398,7 +398,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eBp_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBp_minus, error, error/eBp_minus*100.0, prob);
+      printf("    eBp_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBp_minus, error, fabs(error/eBp_minus*100.0), prob);
     }
 
     ud->type = 's';
@@ -414,7 +414,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eBs_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBs_plus, error, error/eBs_plus*100.0, prob);
+      printf("    eBs_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBs_plus, error, fabs(error/eBs_plus*100.0), prob);
     }
 
     ud->type = 's';
@@ -430,7 +430,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("   eBs_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBs_minus, error, error/eBs_minus*100.0, prob);
+      printf("   eBs_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBs_minus, error, fabs(error/eBs_minus*100.0), prob);
     }
 
     *eBy = eBp_plus + eBp_minus + eBs_plus + eBs_minus;
@@ -450,7 +450,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eBp_plus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBp_plus, error, error/eBp_plus*100.0, prob);
+      printf("    eBp_plus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBp_plus, error, fabs(error/eBp_plus*100.0), prob);
     }
 
     ud->type = 'p';
@@ -466,7 +466,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eBp_minus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBp_minus, error, error/eBp_minus*100.0, prob);
+      printf("    eBp_minus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBp_minus, error, fabs(error/eBp_minus*100.0), prob);
     }
 
     ud->type = 's';
@@ -482,7 +482,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eBs_plus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBs_plus, error, error/eBs_plus*100.0, prob);
+      printf("    eBs_plus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBs_plus, error, fabs(error/eBs_plus*100.0), prob);
     }
 
     ud->type = 's';
@@ -498,7 +498,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("   eBs_minus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBs_minus, error, error/eBs_minus*100.0, prob);
+      printf("   eBs_minus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBs_minus, error, fabs(error/eBs_minus*100.0), prob);
     }
 
     *eBy = eBp_plus + eBp_minus + eBs_plus + eBs_minus;
@@ -518,7 +518,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eBp_plus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBp_plus, error, error/eBp_plus*100.0, prob);
+      printf("    eBp_plus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBp_plus, error, fabs(error/eBp_plus*100.0), prob);
     }
 
     ud->type = 'p';
@@ -534,7 +534,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eBp_minus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBp_minus, error, error/eBp_minus*100.0, prob);
+      printf("    eBp_minus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBp_minus, error, fabs(error/eBp_minus*100.0), prob);
     }
 
     ud->type = 's';
@@ -550,7 +550,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eBs_plus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBs_plus, error, error/eBs_plus*100.0, prob);
+      printf("    eBs_plus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBs_plus, error, fabs(error/eBs_plus*100.0), prob);
     }
 
     ud->type = 's';
@@ -566,7 +566,7 @@ int eB(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("   eBs_minus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBs_minus, error, error/eBs_minus*100.0, prob);
+      printf("   eBs_minus:\t%.8f +- %.8f(%.2f%%)\tp = %.3f\n", eBs_minus, error, fabs(error/eBs_minus*100.0), prob);
     }
 
     *eBy = eBp_plus + eBp_minus + eBs_plus + eBs_minus;
@@ -774,7 +774,7 @@ int eBtminus(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eB_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_plus, error, error/eB_plus*100.0, prob);
+      printf("    eB_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_plus, error, fabs(error/eB_plus*100.0), prob);
     }
 
     ud->flag = '-';
@@ -789,7 +789,7 @@ int eBtminus(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("   eB_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_minus, error, error/eB_minus*100.0, prob);
+      printf("   eB_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_minus, error, fabs(error/eB_minus*100.0), prob);
     }
 
     *eBy = eB_plus + eB_minus;
@@ -808,7 +808,7 @@ int eBtminus(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eB_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_plus, error, error/eB_plus*100.0, prob);
+      printf("    eB_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_plus, error, fabs(error/eB_plus*100.0), prob);
     }
 
     ud->flag = '-';
@@ -823,7 +823,7 @@ int eBtminus(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("   eB_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_minus, error, error/eB_minus*100.0, prob);
+      printf("   eB_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_minus, error, fabs(error/eB_minus*100.0), prob);
     }
 
     *eBy = eB_plus + eB_minus;
@@ -842,7 +842,7 @@ int eBtminus(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("    eB_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_plus, error, error/eB_plus*100.0, prob);
+      printf("    eB_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_plus, error, fabs(error/eB_plus*100.0), prob);
     }
 
     ud->flag = '-';
@@ -857,7 +857,7 @@ int eBtminus(struct userdata *ud,
     *totalerror += error;
     if (verbose == 1) {
       printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
-      printf("   eB_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_minus, error, error/eB_minus*100.0, prob);
+      printf("   eB_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eB_minus, error, fabs(error/eB_minus*100.0), prob);
     }
 
     *eBy = eB_plus + eB_minus;    
