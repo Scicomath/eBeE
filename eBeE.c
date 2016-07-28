@@ -81,8 +81,12 @@ int main(void)
   verbose = 1;
   ud.x = 0.0;
   ud.y = 0.0;
-  ud.t = 0.1;
-  eB(&ud, &ag, &eBy, &error, verbose);
+  ud.t = -0.1;
+  if (ud.t >= 0) {
+    eB(&ud, &ag, &eBy, &error, verbose);
+  } else {
+    eBtminus(&ud, &ag, &eBy, &error, verbose);
+  }
   printf("eBy = %g\terror = %g\trelerror = %g%%\n", eBy, error, error/eBy*100.0);
   
   

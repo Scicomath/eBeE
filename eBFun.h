@@ -4,5 +4,7 @@
 int eB(struct userdata *ud,
        const struct intargu *ag, double *eBy, 
        double *totalerror, const int verbose);
-
+int eBtminus(struct userdata *ud,
+       const struct intargu *ag, double *eBy, 
+       double *totalerror, const int verbose);
 #endif
