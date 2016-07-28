@@ -43,7 +43,7 @@ int main(void)
   printf("# Y0 = %g\n", Y0);
   printf("# Z = %g\n", Z);
 
-  
+  /*
   // 计算原点磁场随时间变化
   int i, N;
   double tmin, tmax;
@@ -59,7 +59,7 @@ int main(void)
     eB(x, y, z, t, R, b, Y0, d, n0, a, Z, &ag, &eBy, &totalerror, verbose);
     printf("%8g\t%8g\t%8g\t%8g\n", t, eBy, totalerror, totalerror/eBy*100.0);
   }
-  
+  */
 
   /* // 计算x-y平面
   int i, j;
@@ -73,11 +73,15 @@ int main(void)
   }
   */
 
-  /*
+  
   // 单点计算
   verbose = 1;
+  x = 0.0;
+  y = 0.0;
+  z = 0.0;
+  t = 0.0;
   eB(x, y, z, t, R, b, Y0, d, n0, a, Z, &ag, &eBy, &totalerror, verbose);
   printf("eBy = %g\terror = %g\trelerror = %g%%\n", eBy, totalerror, totalerror/eBy*100.0);
-  */
+  
   return 0;
 }
