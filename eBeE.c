@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "udStruct.h"
 #include "eBFun.h"
+#include "sqrtStoY.h"
 
 
 int main(void)
@@ -31,7 +32,7 @@ int main(void)
   t = 0.1;
   R = 6.38;
   b = 6.0;
-  Y0 = 5.36;
+  Y0 = sqrtStoY(200);//5.36;
   a = 0.5;
   Z = 79.0;
   printf("# parameter:\n");
