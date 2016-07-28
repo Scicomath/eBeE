@@ -87,8 +87,8 @@ static int eB_Integrand(const int *ndim, const double xx[],
     denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(Y) - ud->z*cosh(Y)) ,1.5));
     //denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(Y)) ,1.5));
     // 判断是否在被积区域内
-    if ( (Sq(x_p + ud->b/2.0) + Sq(y_p) <= Sq(7.0)) &&//(Sq(x_p + ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
-	 (Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(7.0)) &&//(Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
+    if ( (Sq(x_p + ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
+	 (Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
 	 (fabs(denominator) > 0.001) ) {
       eB_y = f(Y,ud->Y0,ud->a) * sinh(Y) * rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->flag ) *
 	(ud->x - x_p) / denominator;
@@ -106,7 +106,7 @@ static int eB_Integrand(const int *ndim, const double xx[],
     //denominator = (pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + Sq(ud->t * sinh(ud->Y0)) ,1.5));
     // 判断是否在被积区域内
     if ( //(Sq(x_p + sign*ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
-	(Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(7.0)) &&//(Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) &&
+        (Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) &&
 	 (fabs(denominator) > 0.001) ) 
       eB_y = rhoFun(x_p, y_p, z_p, ud->R, ud->b, ud->d, ud->n0, ud->flag) *
 	(ud->x - x_p) / denominator;
