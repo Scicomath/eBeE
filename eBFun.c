@@ -14,6 +14,8 @@ static int eB_Int_DK(const int *ndim, const double xx[], const int *ncomp,
 			   double ff[], void *userdata);
 static int eB_Int_Mo(const int *ndim, const double xx[], const int *ncomp,
 			   double ff[], void *userdata);
+static int eB_Int_Mo_ori(const int *ndim, const double xx[], const int *ncomp,
+			   double ff[], void *userdata);
 static int eB_Int_Ai(const int *ndim, const double xx[], const int *ncomp,
 			   double ff[], void *userdata);
 static int eBtminus_Int_DK(const int *ndim, const double xx[], const int *ncomp,
@@ -124,6 +126,105 @@ static int eB_Int_DK(const int *ndim, const double xx[], const int *ncomp,
 
   return 0;
 }
+
+/********************************************************
+ * eB_Int_Mo: 莫玉俊原始方法的磁场(eB)的被积函数             *
+ *******************************************************/
+
+static int eB_Int_Mo_ori(const int *ndim, const double xx[], const int *ncomp, 
+			   double ff[], void *userdata) {
+
+  struct userdata *ud = (struct userdata *) userdata;
+  static double sign;
+  static double jacobian;
+  static double denominator;
+  
+  static double x_p; // 积分变量源点横坐标
+  static double y_p; // 积分变量源点纵坐标
+  static double Y;   // 积分变量快度(注意不是初始快度Y0)
+  static double Imin[3]; // 积分下限
+  static double Imax[3]; // 积分上限
+  
+  // 根据被积区域类型和核标记确定积分上下限
+  if (ud->type == 'p') {
+    Imin[0] = -(ud->R - ud->b/2.0);
+    Imax[0] = ud->R - ud->b/2.0;
+    Imin[1] = -sqrt(Sq(ud->R) - Sq(ud->b/2.0));
+    Imax[1] = sqrt(Sq(ud->R) - Sq(ud->b/2.0));
+    Imin[2] = -ud->Y0;
+    Imax[2] = ud->Y0;
+  } else {
+    // 判断核标记
+    if (ud->flag == '+') {
+      Imin[0] = -(ud->R + ud->b/2.0);
+      Imax[0] = 0.0;
+      Imin[1] = -ud->R;
+      Imax[1] = ud->R;
+    } else {
+      Imin[0] = 0.0;
+      Imax[0] = ud->R + ud->b/2.0;
+      Imin[1] = -ud->R;
+      Imax[1] = ud->R;
+    }
+  }
+  // 变量变换 x -> min + (max - min) * x 将积分区间变为0-1
+  x_p = Imin[0] + (Imax[0] - Imin[0]) * xx[0];
+  y_p = Imin[1] + (Imax[1] - Imin[1]) * xx[1];
+  if (*ndim == 3)
+    Y = Imin[2] + (Imax[2] - Imin[2]) * xx[2];
+  
+  // 判断被积区域类型
+  if (ud->type == 'p') { // 对于参与者(p)
+    // 判断符号正负
+    if (ud->flag == '+')
+      sign = 1.0;
+    else
+      sign = -1.0;
+    denominator = pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + 
+		      Sq(ud->t * sign * sinh(Y) - ud->z * cosh(Y)) ,1.5);
+    // 判断是否在被积区域内
+    if ( (Sq(x_p + ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
+	 (Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
+	 (fabs(denominator) > 0.001) ) {
+      eB_y = f(Y,ud->Y0,ud->a) * sinh(Y) * 
+	rhoFun_Mo_ori(x_p, y_p, ud->R, ud->b, ud->flag ) *
+	(ud->x - x_p) / denominator;
+    }
+    else
+      eB_y = 0.0;
+  } else if (ud->type == 's') {
+    // 判断符号正负
+    if (ud->flag == '+')
+      sign = 1.0;
+    else
+      sign = -1.0;
+
+    denominator = pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + 
+		      Sq(ud->t * sign * sinh(ud->Y0) - ud->z * cosh(ud->Y0)) ,1.5);
+    // 判断是否在被积区域内
+    if ( (Sq(x_p + sign*ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
+	 (Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) &&
+	 (fabs(denominator) > 0.001) ) 
+      eB_y = rhoFun_Mo_ori(x_p, y_p, ud->R, ud->b, ud->flag) *
+	(ud->x - x_p) / denominator;
+    else {
+      eB_y = 0.0;
+    }
+    
+  } else {
+    printf("[eBpFun.c]error: 被积函数类型(type)只能为，参与者'p'或旁观者's'\n");
+  }
+
+  jacobian = 1.0;
+  for (int i = 0; i < *ndim; i++) {
+    jacobian = jacobian * (Imax[i] - Imin[i]);
+  }
+
+  eB_y = jacobian * eB_y;
+
+  return 0;
+}
+
 
 /********************************************************
  * eB_Int_Mo: 莫玉俊方法的磁场(eB)的被积函数             *
@@ -570,6 +671,76 @@ int eB(struct userdata *ud,
     }
 
     *eBy = eBp_plus + eBp_minus + eBs_plus + eBs_minus;
+  } else if (ud->method == 4) { // 莫玉俊原始方法
+    
+    *totalerror = 0.0;
+
+    ud->type = 'p';
+    ud->flag = '+';
+    Vegas(3, 1, eB_Int_Mo_ori, ud, ag->nvec,
+	  ag->epsrel, ag->epsabs, ag->flags, ag->seed,
+	  ag->pmineval, ag->pmaxeval, ag->nstart, ag->nincrease,
+	  ag->nbatch, ag->gridno, ag->statefile, ag->spin,
+	  &neval, &fail, &integral, &error, &prob);
+    constant = Sq(hbarc) * ud->Z * alpha_EM;
+    eBp_plus = constant * integral;
+    error = fabs(constant * error);
+    *totalerror += error;
+    if (verbose == 1) {
+      printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+      printf("    eBp_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBp_plus, error, fabs(error/eBp_plus*100.0), prob);
+    }
+
+    ud->type = 'p';
+    ud->flag = '-';
+    Vegas(3, 1, eB_Int_Mo_ori, ud, ag->nvec,
+	  ag->epsrel, ag->epsabs, ag->flags, ag->seed,
+	  ag->pmineval, ag->pmaxeval, ag->nstart, ag->nincrease,
+	  ag->nbatch, ag->gridno, ag->statefile, ag->spin,
+	  &neval, &fail, &integral, &error, &prob);
+    constant = -constant;
+    eBp_minus = constant * integral;
+    error = fabs(constant * error);
+    *totalerror += error;
+    if (verbose == 1) {
+      printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+      printf("    eBp_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBp_minus, error, fabs(error/eBp_minus*100.0), prob);
+    }
+
+    ud->type = 's';
+    ud->flag = '+';
+    Vegas(2, 1, eB_Int_Mo_ori, ud, ag->nvec,
+	  ag->epsrel, ag->epsabs, ag->flags, ag->seed,
+	  ag->smineval, ag->smaxeval, ag->nstart, ag->nincrease,
+	  ag->nbatch, ag->gridno, ag->statefile, ag->spin,
+	  &neval, &fail, &integral, &error, &prob);
+    constant = Sq(hbarc) * ud->Z * alpha_EM * sinh(ud->Y0);
+    eBs_plus = constant * integral;
+    error = fabs(constant * error);
+    *totalerror += error;
+    if (verbose == 1) {
+      printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+      printf("    eBs_plus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBs_plus, error, fabs(error/eBs_plus*100.0), prob);
+    }
+
+    ud->type = 's';
+    ud->flag = '-';
+    Vegas(2, 1, eB_Int_Mo_ori, ud, ag->nvec,
+	  ag->epsrel, ag->epsabs, ag->flags, ag->seed,
+	  ag->smineval, ag->smaxeval, ag->nstart, ag->nincrease,
+	  ag->nbatch, ag->gridno, ag->statefile, ag->spin,
+	  &neval, &fail, &integral, &error, &prob);
+    constant = -constant;
+    eBs_minus = constant * integral;
+    error = fabs(constant * error);
+    *totalerror += error;
+    if (verbose == 1) {
+      printf("Vegas result:\tneval %d\tfail %d\n", neval, fail);
+      printf("   eBs_minus:\t%.8f +- %.8f(%.3f%%)\tp = %.3f\n", eBs_minus, error, fabs(error/eBs_minus*100.0), prob);
+    }
+
+    *eBy = eBp_plus + eBp_minus + eBs_plus + eBs_minus;
+
   }
 
   return 0;
