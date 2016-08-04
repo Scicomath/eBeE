@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-O3 -std=c99
 
-objects = eBeE.o eBFun.o rhoFun.o sq.o sqrtStoY.o
+objects = eBeE.o eBFun.o rhoFun.o sq.o sqrtStoY.o mean_eB.o
 
 eBeE: $(objects)
 	$(CC) $(CFLAGS) -o eBeE $(objects) -I. libcuba.a -lgsl -lgslcblas -lm
@@ -20,6 +20,9 @@ sq.o: sq.c sq.h
 
 sqrtStoY.o: sqrtStoY.c sqrtStoY.h sq.h
 	$(CC) $(CFLAGS) -c sqrtStoY.c
+
+mean_eB.o: mean_eB.c udStruct.h eBFun.h sq.h
+	$(CC) $(CFLAGS) -c mean_eB.c
 
 .PHONY: clean
 clean:

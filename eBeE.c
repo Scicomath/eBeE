@@ -3,12 +3,13 @@
 #include "udStruct.h"
 #include "eBFun.h"
 #include "sqrtStoY.h"
+#include "mean_eB.h"
 
 
 int main(void)
 {
   struct intargu ag;
-  double eBy, error;
+  double eBy, mean_eBy, error;
   int verbose;
   ag.nvec = 1;
   ag.epsrel = 1e-3;
@@ -67,7 +68,8 @@ int main(void)
     printf("  %-8g\t%-8g\t%-8g\t%-8g\n", ud.t, eBy, error, fabs(error/eBy*100.0));
   }
   */
-  
+
+  /*
   // 计算x-y平面
   int i, j;
   verbose = 0;
@@ -83,7 +85,7 @@ int main(void)
       printf("  %-8g\t%-8g\t%-8g\t%-8g\t%-8g\n", ud.x, ud.y, eBy, error, fabs(error/eBy*100.0));
     }
   }
-  
+  */
 
   /*
   // 计算单点磁场
@@ -98,6 +100,10 @@ int main(void)
   }
   printf("eBy = %g\terror = %g\trelerror = %g%%\n", eBy, error, fabs(error/eBy*100.0));
   */
+
+  // 计算平均磁场
+  mean_eB_homo(&ud, &ag, &mean_eBy);
+  printf("<eBy> = %g\n", mean_eBy);
   
   return 0;
 }
