@@ -11,8 +11,8 @@ int main(void)
   double eBy, error;
   int verbose;
   ag.nvec = 1;
-  ag.epsrel = 1e-3;
-  ag.epsabs = 1e-9;
+  ag.epsrel = 1e-2;
+  ag.epsabs = 1e-8;
   ag.flags = 0 | 8; // 0 | 8
   ag.seed = 0;
   ag.smineval = 1.5e3; // 1.5e5
@@ -39,11 +39,11 @@ int main(void)
   ud.n0 = 8.596268e-4;
   ud.a = 0.5;
   ud.Z = 79.0;
-  printf("# parameter:\n");
-  printf("# R = %g\n", ud.R);
-  printf("# b = %g\n", ud.b);
-  printf("# Y0 = %g\n", ud.Y0);
-  printf("# Z = %g\n", ud.Z);
+  //  printf("# parameter:\n");
+  //  printf("# R = %g\n", ud.R);
+  //  printf("# b = %g\n", ud.b);
+  //  printf("# Y0 = %g\n", ud.Y0);
+  //  printf("# Z = %g\n", ud.Z);
 
   ud.method = 0; // 0|1|2 : 分别表示Kharzeev,莫玉俊,艾鑫的方法
   /*
@@ -68,19 +68,32 @@ int main(void)
   }
   */
   
-  // 计算x-y平面
-  int i, j;
+  // 计算x-z平面
+  int i, j, k;
+  ud.y = 0.0;
   verbose = 0;
-  for (i = 0; i <= 400; i++) { 
-    for (j = 0; j <= 400; j++) {
-      ud.x = -10. + (20.)*i/400.;
-      ud.y = -10. + (20.)*j/400.;
-      if (ud.t >= 0) {
-	eB(&ud, &ag, &eBy, &error, verbose);
-      } else {
-	eBtminus(&ud, &ag, &eBy, &error, verbose);
+  for (i = 0; i <= 60; i++) { 
+    for (j = 0; j <= 200; j++) {
+      for (k = 0; k <= 200; k++) {
+	ud.t = -3. + (6.)*i/60;
+	ud.x = -10. + (20.)*j/200.;
+	ud.z = -10. + (20.)*k/200.;
+	if (i < 52) {
+	  continue;
+	}
+	if (i == 52 && j < 118) {
+	  continue;
+	}
+	if (i == 52 && j == 118 && k <= 173) {
+	  continue;
+	}
+	if (ud.t >= 0) {
+	  eB(&ud, &ag, &eBy, &error, verbose);
+	} else {
+	  eBtminus(&ud, &ag, &eBy, &error, verbose);
+	}
+	printf("%-8g\t%-8g\t%-8g\t%-8g\t%-8g\t%-8g\n",ud.t, ud.x, ud.z, eBy, error, fabs(error/eBy*100.0));
       }
-      printf("  %-8g\t%-8g\t%-8g\t%-8g\t%-8g\n", ud.x, ud.y, eBy, error, fabs(error/eBy*100.0));
     }
   }
   
