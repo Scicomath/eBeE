@@ -33,7 +33,7 @@ int mean_eB_homo(struct userdata *ud, const struct intargu *ag,
   for (int i = 0; i <= N; i++) {
     ud->z = zmin + range*i/N;
     eB(ud, ag, &eBy, &error, verbose);
-    printf("z = %g\teBy = %g\terror = %g\n", ud->z, eBy, error);
+    //printf("z = %g\teBy = %g\terror = %g\n", ud->z, eBy, error);
     *mean_eBy += eBy;
   }
   *mean_eBy /= (N+1);

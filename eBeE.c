@@ -34,7 +34,7 @@ int main(void)
   ud.y = 0.0;
   ud.t = 0.1;
   ud.R = 6.38;
-  ud.b = 6.0;
+  ud.b = 4.0;
   ud.Y0 = sqrtStoY(200);//质心系能量200GeV
   ud.d = 0.535;
   ud.n0 = 8.596268e-4;
@@ -100,10 +100,32 @@ int main(void)
   }
   printf("eBy = %g\terror = %g\trelerror = %g%%\n", eBy, error, fabs(error/eBy*100.0));
   */
-
-  // 计算平均磁场
+  /*
+  // 计算单点平均磁场
+  ud.x = 0.0;
+  ud.y = 0.0;
+  ud.t = 0.0;
+  ud.method = 2;
   mean_eB_homo(&ud, &ag, &mean_eBy);
   printf("<eBy> = %g\n", mean_eBy);
+  */
+  
+ 
+  // 计算原点平均磁场随时间的变化
+  int i, N;
+  double tmin, tmax;
+  ud.method = 2;
+  ud.x = 0.0;
+  ud.y = 0.0;
+  N = 200;
+  tmin = 0.0;
+  tmax = 3.0;
+  printf("# t       \teBy\n");
+  for (i = 0; i <= N; i++) {
+    ud.t = tmin + (tmax - tmin)*i/N;
+    mean_eB_homo(&ud, &ag, &mean_eBy);
+    printf("  %-8g\t%-8g\n", ud.t, mean_eBy);
+  }
   
   return 0;
 }
