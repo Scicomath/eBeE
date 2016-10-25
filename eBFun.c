@@ -302,7 +302,7 @@ static int eB_Int_Ai(const int *ndim, const double xx[], const int *ncomp,
       sign = -1.0;
 
     denominator = pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + 
-		      Sq(ud->t * sign * sinh(Y) + (sign*z_p - ud->z)*cosh(Y)) ,1.5);
+		      Sq(ud->t * sign * sinh(Y) + (z_p - ud->z)*cosh(Y)) ,1.5);
     // 判断是否在被积区域内
     if ( (Sq(x_p + ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
 	 (Sq(x_p - ud->b/2.0) + Sq(y_p) <= Sq(ud->R)) &&
@@ -322,7 +322,7 @@ static int eB_Int_Ai(const int *ndim, const double xx[], const int *ncomp,
 
     denominator = pow(Sq(x_p - ud->x) + Sq(y_p - ud->y) + 
 		      Sq(ud->t * sign * sinh(ud->Y0) + 
-			 (sign*z_p - ud->z)*cosh(ud->Y0)) ,1.5);
+			 (z_p - ud->z)*cosh(ud->Y0)) ,1.5);
     // 判断是否在被积区域内
     if ( (Sq(x_p - sign*ud->b/2.0) + Sq(y_p) >= Sq(ud->R)) &&
 	 (fabs(denominator) > 0.001) ) 
