@@ -1,3 +1,5 @@
+*.dat
+libcuba.a
 eBeE
 libcuba.a
 *.o
