@@ -123,7 +123,49 @@ int main(int argc, char **argv)
       }
     }
   }
-  
+
+  if (strcmp(argv[5], "x-y") == 0) {
+    // 计算x-y平面
+    int i, j, xN, yN;
+    double xmin, xmax, ymin, ymax;
+    xmin = -20.0;
+    xmax = 20.0;
+    ymin = -20.0;
+    ymax = 20.0;
+    xN = 200;
+    yN = 200;
+    ud.z = 0.0;
+    verbose = 0;
+    ud.t = atof(argv[6]);
+    for (i = 0; i <= xN; i++) {
+      for (j = 0; j <= yN; j++) {
+	ud.x = xmin + (xmax - xmin)*i/xN;
+	ud.y = ymin + (ymax - ymin)*j/yN;
+	if (ud.t >= 0) {
+	  eB(&ud, &ag, &eBy, &error, verbose);
+	} else {
+	  eBtminus(&ud, &ag, &eBy, &error, verbose);
+	}
+	printf("%-8g\t%-8g\t%-8g\t%-8g\t%-8g\n", ud.x, ud.y, eBy, error, fabs(error/eBy*100.0));
+      }
+    }
+  }
+
+  if (strcmp(argv[5], "aveOrigin") == 0) {
+    int i, N;
+    double tmin, tmax;
+    ud.x = 0.0;
+    ud.y = 0.0;
+    N = 200;
+    tmin = 0.0;
+    tmax = 3.0;
+    for (i = 0; i <= N; i++) {
+      ud.t = tmin + (tmax - tmin)*i/N;
+      mean_eB_homo(&ud, &ag, &mean_eBy);
+      printf("  %-8g\t%-8g\n", ud.t, mean_eBy);
+    }
+    
+  }
   
   if (strcmp(argv[5], "originSingle") == 0) {
     verbose = 1;
