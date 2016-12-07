@@ -4,7 +4,7 @@ CFLAGS=-O3 -std=c99
 objects = eBeE.o eBFun.o rhoFun.o sq.o sqrtStoY.o mean_eB.o
 
 eBeE: $(objects)
-	$(CC) $(CFLAGS) -o eBeE $(objects) -I. libcuba.a -lgsl -lgslcblas -lm
+	$(CC) $(CFLAGS) -o eBeE $(objects) -lcuba -lgsl -lgslcblas -lm
 
 eBeE.o: eBeE.c udStruct.h eBFun.h sqrtStoY.h
 	$(CC) $(CFLAGS) -c eBeE.c
